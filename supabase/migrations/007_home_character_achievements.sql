@@ -11,10 +11,12 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS character_data JSONB DEFAULT jsonb
   'accessory',  'none'
 );
 
--- 2. Couple home
+-- 2. Couple/solo home
+-- couple_id holds either a couple_links.id (paired users) or a profiles.id (solo user).
+-- No FK so both work; RLS checks both cases.
 CREATE TABLE IF NOT EXISTS couple_homes (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  couple_id  UUID UNIQUE NOT NULL REFERENCES couple_links(id) ON DELETE CASCADE,
+  couple_id  UUID UNIQUE NOT NULL,
   background TEXT NOT NULL DEFAULT 'cozy',
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -22,8 +24,12 @@ CREATE TABLE IF NOT EXISTS couple_homes (
 
 ALTER TABLE couple_homes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "couple_homes_couple_only" ON couple_homes
+CREATE POLICY "couple_homes_access" ON couple_homes
   FOR ALL USING (
+    -- solo: user owns the home directly
+    couple_id = auth.uid()
+    OR
+    -- paired: user belongs to the couple
     couple_id IN (
       SELECT id FROM couple_links
       WHERE user_a_id = auth.uid() OR user_b_id = auth.uid()
@@ -31,9 +37,10 @@ CREATE POLICY "couple_homes_couple_only" ON couple_homes
   );
 
 -- 3. Home placements (items on the 8×6 room grid)
+-- Same no-FK pattern as couple_homes for the same reason.
 CREATE TABLE IF NOT EXISTS home_placements (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  couple_id   UUID NOT NULL REFERENCES couple_links(id) ON DELETE CASCADE,
+  couple_id   UUID NOT NULL,
   item_slug   TEXT NOT NULL,
   item_emoji  TEXT NOT NULL,
   item_label  TEXT NOT NULL,
@@ -46,8 +53,10 @@ CREATE TABLE IF NOT EXISTS home_placements (
 
 ALTER TABLE home_placements ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "home_placements_couple_only" ON home_placements
+CREATE POLICY "home_placements_access" ON home_placements
   FOR ALL USING (
+    couple_id = auth.uid()
+    OR
     couple_id IN (
       SELECT id FROM couple_links
       WHERE user_a_id = auth.uid() OR user_b_id = auth.uid()
