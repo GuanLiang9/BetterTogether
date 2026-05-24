@@ -424,7 +424,7 @@ export interface Database {
           slug?: string;
           name?: string;
           description?: string | null;
-          category?: "theme" | "plant_skin" | "badge" | "reaction" | "couple_frame" | "sound";
+          category?: "theme" | "plant_skin" | "badge" | "reaction" | "couple_frame" | "sound" | "furniture" | "outfit";
           preview_url?: string | null;
           coin_cost?: number | null;
           xp_required?: number;

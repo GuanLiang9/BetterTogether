@@ -125,6 +125,15 @@ CREATE TABLE IF NOT EXISTS daily_rewards (
 ALTER TABLE daily_rewards ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "daily_rewards_own" ON daily_rewards FOR ALL USING (user_id = auth.uid());
 
+-- 7a. Patch unlockables table from migration 006
+--     Add is_active column (missing from original schema)
+ALTER TABLE unlockables ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+
+--     Expand category CHECK to include furniture and outfit
+ALTER TABLE unlockables DROP CONSTRAINT IF EXISTS unlockables_category_check;
+ALTER TABLE unlockables ADD CONSTRAINT unlockables_category_check
+  CHECK (category IN ('theme','plant_skin','badge','reaction','couple_frame','sound','furniture','outfit'));
+
 -- 7. Seed furniture unlockables
 INSERT INTO unlockables (slug, name, description, category, coin_cost, xp_required, level_required, is_active)
 VALUES
