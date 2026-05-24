@@ -3,33 +3,38 @@
 import { useCallback, useEffect } from "react";
 import { useHomeStore } from "@/stores/homeStore";
 import { useCoupleStore } from "@/stores/coupleStore";
+import { useAuthStore } from "@/stores/authStore";
 import { getOrCreateHome, getHomePlacements } from "@/features/home/actions/home.actions";
 
 export function useHome() {
-  const couple = useCoupleStore((s) => s.couple);
+  const coupleId = useCoupleStore((s) => s.couple?.id);
+  const profileId = useAuthStore((s) => s.profile?.id);
+  // Solo users get their own home; coupled users share one keyed on couple_id
+  const homeKey = coupleId ?? profileId;
+
   const { home, placements, isLoading, hydratedForId, setHome, setPlacements, setLoading, setHydratedForId } =
     useHomeStore();
 
   const hydrate = useCallback(async () => {
-    if (!couple?.id) return;
-    if (hydratedForId === couple.id) return;
+    if (!homeKey) return;
+    if (hydratedForId === homeKey) return;
     setLoading(true);
     try {
       const [homeData, placementsData] = await Promise.all([
-        getOrCreateHome(couple.id),
-        getHomePlacements(couple.id),
+        getOrCreateHome(homeKey),
+        getHomePlacements(homeKey),
       ]);
       setHome(homeData as Parameters<typeof setHome>[0]);
       setPlacements(placementsData as Parameters<typeof setPlacements>[0]);
-      setHydratedForId(couple.id);
+      setHydratedForId(homeKey);
     } finally {
       setLoading(false);
     }
-  }, [couple?.id, hydratedForId, setHome, setPlacements, setLoading, setHydratedForId]);
+  }, [homeKey, hydratedForId, setHome, setPlacements, setLoading, setHydratedForId]);
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
 
-  return { home, placements, isLoading, refetch: hydrate };
+  return { home, placements, isLoading, homeKey: homeKey ?? "", refetch: hydrate };
 }

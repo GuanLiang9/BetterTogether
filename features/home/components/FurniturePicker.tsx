@@ -8,12 +8,12 @@ import { useHomeStore } from "@/stores/homeStore";
 import { placeItem } from "@/features/home/actions/home.actions";
 
 interface FurniturePickerProps {
-  coupleId: string;
+  homeKey: string;
   cell: { x: number; y: number };
   onClose: () => void;
 }
 
-export function FurniturePicker({ coupleId, cell, onClose }: FurniturePickerProps) {
+export function FurniturePicker({ homeKey, cell, onClose }: FurniturePickerProps) {
   const [placing, setPlacing] = useState<string | null>(null);
   const userUnlockables = useGamificationStore((s) => s.userUnlockables);
   const unlockables = useGamificationStore((s) => s.unlockables);
@@ -25,7 +25,7 @@ export function FurniturePicker({ coupleId, cell, onClose }: FurniturePickerProp
   async function handlePlace(slug: string, emoji: string, label: string) {
     setPlacing(slug);
     try {
-      const result = await placeItem(coupleId, slug, emoji, label, cell.x, cell.y);
+      const result = await placeItem(homeKey, slug, emoji, label, cell.x, cell.y);
       addPlacement(result as Parameters<typeof addPlacement>[0]);
       onClose();
     } catch (err) {

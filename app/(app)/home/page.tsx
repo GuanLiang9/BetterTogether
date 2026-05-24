@@ -1,6 +1,6 @@
 "use client";
 
-import { Home as HomeIcon, ShoppingBag, BarChart2 } from "lucide-react";
+import { Home as HomeIcon, ShoppingBag, BarChart2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { HomeRoom } from "@/features/home/components/HomeRoom";
@@ -12,24 +12,6 @@ export default function HomePage() {
   const { isLoading } = useHome();
   const couple = useCoupleStore((s) => s.couple);
 
-  if (!couple) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-20 text-center animate-fade-in">
-        <div className="text-5xl">🏡</div>
-        <h2 className="text-lg font-bold text-slate-200">No home yet</h2>
-        <p className="text-sm text-slate-500 max-w-xs">
-          Link with your partner first — then you can build and decorate your shared space together.
-        </p>
-        <Link
-          href="/partner"
-          className="px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium hover:bg-emerald-500/20 transition-all"
-        >
-          Find your partner
-        </Link>
-      </div>
-    );
-  }
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -38,6 +20,8 @@ export default function HomePage() {
     );
   }
 
+  const isSolo = !couple;
+
   return (
     <div className="flex flex-col gap-5 animate-fade-up">
       {/* Header */}
@@ -45,17 +29,23 @@ export default function HomePage() {
         <div>
           <div className="flex items-center gap-2">
             <HomeIcon className="h-5 w-5 text-emerald-400" />
-            <h1 className="text-xl font-bold text-slate-100">Our Home</h1>
+            <h1 className="text-xl font-bold text-slate-100">
+              {isSolo ? "My Home" : "Our Home"}
+            </h1>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">Build and decorate your shared space</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {isSolo ? "Your personal space — link a partner to share it" : "Your shared space together"}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/dashboard">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-medium hover:bg-white/10 transition-all">
-              <BarChart2 className="w-3.5 h-3.5" />
-              Stats
-            </div>
-          </Link>
+          {isSolo && (
+            <Link href="/partner">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/15 transition-all">
+                <UserPlus className="w-3.5 h-3.5" />
+                Link partner
+              </div>
+            </Link>
+          )}
           <Link href="/shop">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-400 text-xs font-medium hover:bg-amber-400/15 transition-all">
               <ShoppingBag className="w-3.5 h-3.5" />
@@ -64,6 +54,19 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
+
+      {/* Solo nudge banner */}
+      {isSolo && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/3 border border-white/8">
+          <span className="text-xl">🤝</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-slate-300">Decorate alone, or together</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              Link with a partner and this becomes your shared home — furniture and all.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Room */}
       <Card className="p-3">

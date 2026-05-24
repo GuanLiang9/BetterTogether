@@ -3,22 +3,21 @@
 import { useState, memo } from "react";
 import { HOME_BACKGROUNDS } from "@/types/home.types";
 import { useHomeStore } from "@/stores/homeStore";
-import { useCoupleStore } from "@/stores/coupleStore";
+import { useHome } from "@/features/home/hooks/useHome";
 import { updateBackground } from "@/features/home/actions/home.actions";
 
 export const BackgroundPicker = memo(function BackgroundPicker() {
-  // Selective selectors — avoids re-render when placements change
   const background = useHomeStore((s) => s.home?.background ?? "cozy");
   const updateLocalBg = useHomeStore((s) => s.updateBackground);
-  const coupleId = useCoupleStore((s) => s.couple?.id);
+  const { homeKey } = useHome();
   const [saving, setSaving] = useState(false);
 
   async function handleSelect(key: string) {
-    if (!coupleId || saving) return;
+    if (!homeKey || saving) return;
     setSaving(true);
     updateLocalBg(key);
     try {
-      await updateBackground(coupleId, key);
+      await updateBackground(homeKey, key);
     } finally {
       setSaving(false);
     }

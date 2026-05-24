@@ -7,6 +7,7 @@ import { useCoupleStore } from "@/stores/coupleStore";
 import { useAuthStore } from "@/stores/authStore";
 import { HOME_BACKGROUNDS } from "@/types/home.types";
 import { removeItem } from "@/features/home/actions/home.actions";
+import { useHome } from "@/features/home/hooks/useHome";
 import type { HomePlacement } from "@/types/home.types";
 
 // Lazy-load the picker — it imports the full furniture catalog and unlockables store
@@ -25,6 +26,7 @@ export const HomeRoom = memo(function HomeRoom() {
   const partner = useCoupleStore((s) => s.partner);
   const partnerOnline = useCoupleStore((s) => s.partnerOnline);
   const displayName = useAuthStore((s) => s.profile?.display_name);
+  const { homeKey } = useHome();
 
   const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -60,35 +62,35 @@ export const HomeRoom = memo(function HomeRoom() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Partner presence bar */}
-      {couple && (
-        <div className="flex items-center gap-2 px-1">
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs">
-              {displayName?.[0]?.toUpperCase() ?? "Y"}
-            </div>
-            <span className="text-xs text-slate-400">You</span>
+      {/* Residents bar */}
+      <div className="flex items-center gap-2 px-1">
+        <div className="flex items-center gap-1.5">
+          <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs">
+            {displayName?.[0]?.toUpperCase() ?? "Y"}
           </div>
-          <div className="h-px flex-1 bg-white/5" />
-          {partner ? (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-slate-400">{partner.display_name}</span>
-              <div className="relative">
-                <div className="w-6 h-6 rounded-full bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-xs">
-                  {partner.display_name?.[0]?.toUpperCase() ?? "P"}
-                </div>
-                <div
-                  className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-slate-900 ${
-                    partnerOnline ? "bg-emerald-400" : "bg-slate-600"
-                  }`}
-                />
-              </div>
-            </div>
-          ) : (
-            <span className="text-xs text-slate-600">No partner yet</span>
-          )}
+          <span className="text-xs text-slate-400">You</span>
         </div>
-      )}
+        <div className="h-px flex-1 bg-white/5" />
+        {couple && partner ? (
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-slate-400">{partner.display_name}</span>
+            <div className="relative">
+              <div className="w-6 h-6 rounded-full bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-xs">
+                {partner.display_name?.[0]?.toUpperCase() ?? "P"}
+              </div>
+              <div
+                className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-slate-900 ${
+                  partnerOnline ? "bg-emerald-400" : "bg-slate-600"
+                }`}
+              />
+            </div>
+          </div>
+        ) : (
+          <span className="text-xs text-slate-600 italic">
+            {couple ? "Partner not linked yet" : "Link a partner to share this space"}
+          </span>
+        )}
+      </div>
 
       {/* Room grid */}
       <div
@@ -142,10 +144,10 @@ export const HomeRoom = memo(function HomeRoom() {
         Tap any empty cell to place furniture · {placements.length}/{COLS * ROWS} spots filled
       </p>
 
-      {pickerOpen && selectedCell && couple && (
+      {pickerOpen && selectedCell && homeKey && (
         <Suspense fallback={null}>
           <FurniturePicker
-            coupleId={couple.id}
+            homeKey={homeKey}
             cell={selectedCell}
             onClose={() => {
               setPickerOpen(false);
