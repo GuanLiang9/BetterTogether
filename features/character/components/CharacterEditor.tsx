@@ -15,6 +15,7 @@ import {
 import { CharacterCard } from "./CharacterCard";
 import { useAuthStore } from "@/stores/authStore";
 import { getLevelTitle } from "@/lib/gamification/level-thresholds";
+import type { CharacterData } from "@/types/character.types";
 
 const SECTION_TITLES = ["Base", "Avatar", "Frame", "Accessory", "Title"] as const;
 type Section = typeof SECTION_TITLES[number];
@@ -30,6 +31,7 @@ export function CharacterEditor() {
   const { setBase, setAvatar, setFrame, setAccessory, setTitle } = useCharacterStore();
   const profile = useAuthStore((s) => s.profile);
   const level = profile?.level ?? 1;
+  const characterData = profile?.character_data as CharacterData | null | undefined;
 
   return (
     <div className="flex flex-col gap-5">
@@ -37,6 +39,7 @@ export function CharacterEditor() {
       <div className="flex justify-center py-4">
         <CharacterCard
           config={config}
+          characterData={characterData}
           size="lg"
           displayName={profile?.display_name ?? "You"}
           level={level}

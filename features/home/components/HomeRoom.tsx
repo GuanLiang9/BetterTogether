@@ -9,6 +9,7 @@ import { HOME_BACKGROUNDS } from "@/types/home.types";
 import { removeItem } from "@/features/home/actions/home.actions";
 import { useHome } from "@/features/home/hooks/useHome";
 import type { HomePlacement } from "@/types/home.types";
+import { FurnitureIcon } from "./FurnitureIcon";
 
 // Lazy-load the picker — it imports the full furniture catalog and unlockables store
 const FurniturePicker = lazy(() =>
@@ -118,9 +119,7 @@ export const HomeRoom = memo(function HomeRoom() {
                 >
                   {placement ? (
                     <div className="relative w-full h-full flex items-center justify-center">
-                      <span className="text-2xl leading-none select-none" title={placement.item_label}>
-                        {placement.item_emoji}
-                      </span>
+                      <FurnitureIcon slug={placement.item_slug} size={34} />
                       <button
                         onClick={(e) => handleRemove(placement, e)}
                         disabled={removing === placement.id}

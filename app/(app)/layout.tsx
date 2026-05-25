@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import type { ReactNode } from "react";
 import { TopBar } from "@/components/layout/TopBar";
 import { BottomNav } from "@/components/layout/BottomNav";

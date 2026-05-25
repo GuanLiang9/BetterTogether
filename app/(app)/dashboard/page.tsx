@@ -28,6 +28,7 @@ export default function DashboardPage() {
   }, []);
 
   const characterConfig = useCharacterStore((s) => s.config);
+  const characterData = profile?.character_data as import("@/types/character.types").CharacterData | null | undefined;
 
   const level = profile?.level ?? 1;
   const totalXp = profile?.xp ?? 0;
@@ -54,7 +55,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <Link href="/character">
-          <CharacterCard config={characterConfig} size="sm" />
+          <CharacterCard config={characterConfig} characterData={characterData} size="sm" level={level} />
         </Link>
       </div>
 

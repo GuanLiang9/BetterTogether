@@ -11,15 +11,6 @@ import { useCoupleStore } from "@/stores/coupleStore";
 export default function HomePage() {
   const { isLoading } = useHome();
   const couple = useCoupleStore((s) => s.couple);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin" />
-      </div>
-    );
-  }
-
   const isSolo = !couple;
 
   return (
@@ -62,21 +53,36 @@ export default function HomePage() {
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-slate-300">Decorate alone, or together</p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Link with a partner and this becomes your shared home — furniture and all.
+              Link with a partner and this becomes your shared home.
             </p>
           </div>
         </div>
       )}
 
-      {/* Room */}
+      {/* Room — show skeleton while loading, then real room */}
       <Card className="p-3">
-        <HomeRoom />
+        {isLoading ? <RoomSkeleton /> : <HomeRoom />}
       </Card>
 
       {/* Background picker */}
       <Card className="p-4">
-        <BackgroundPicker />
+        {isLoading ? <div className="h-16 rounded-xl bg-white/5 animate-pulse" /> : <BackgroundPicker />}
       </Card>
+    </div>
+  );
+}
+
+function RoomSkeleton() {
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-2 px-1">
+        <div className="w-6 h-6 rounded-full bg-white/8 animate-pulse" />
+        <div className="w-8 h-3 rounded bg-white/8 animate-pulse" />
+        <div className="flex-1 h-px bg-white/5" />
+        <div className="w-16 h-3 rounded bg-white/8 animate-pulse" />
+      </div>
+      <div className="rounded-2xl bg-white/4 animate-pulse" style={{ minHeight: 280 }} />
+      <div className="w-32 h-3 rounded bg-white/5 animate-pulse mx-auto" />
     </div>
   );
 }
