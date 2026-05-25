@@ -19,6 +19,8 @@
     "lucide-react": "^1.16.0",
     "nanoid": "^5.1.11",
     "next": "15.5.18",
+    "playwright": "^1.60.0",
+    "puppeteer": "^25.0.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.76.1",
